@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Hello React</title>
+    <link rel="stylesheet" href="">
+  </head>
+  <body>
+    <div id="app">
+      <!-- the app renders here -->
+    </div>
+    <script src="react-15.3.1/build/react.js"></script>
+    <script src="react-15.3.1/build/react-dom.js"></script>
+    <script>
+    let logMixin = {
+      _log: function(methodName, args) {
+        console.log(this.name + "::" + methodName, args);
+      },
+      componentWillUpdate: function() {
+        this._log("componentWillUpdate", arguments);
+      },
+      componentDidUpdate: function() {
+        this._log("componentDidUpdate", arguments);
+      },
+      componentWillMount: function() {
+        this._log("componentWillMount", arguments);
+      },
+      componentDidMount: function() {
+        this._log("componentDidMount", arguments);
+      },
+      componentWillUnmount: function() {
+        this._log("componentWillUnmount", arguments);
+      },
+    };
+
+    let TextAreaCounter = React.createClass({
+      name: "TextAreaCounter",
+      mixins: [logMixin],
+      propTypes: {
+        defaultValue: React.PropTypes.string
+      },
+      componentWillReceiveProps: function(newProps) {
+        this.setState({
+          text: newProps.defaultValue,
+        });
+      },
+      getInitialState: function() {
+        return {
+          defaultValue: this.props.defaultValue,
+        };
+      },
+      _textChange: function(ev) {
+        this.setState({
+          defaultValue: ev.target.value,
+        });
+      },
+        propTypes: {
+          defaultValue: React.PropTypes.string,
+        },
+      getDefaultProps: function() {
+        return {
+          defaultValue: "",
+      };
+    },
+      render: function() {
+        let counter = null;
+        if (this.state.text.length > 0) {
+          counter = React.DOM.h3(null,
+            React.createElement(Counter, {
+              count: this.state.text.length,
+            })
+          );
+        }
+        return React.DOM.div(null,
+          React.DOM.textarea({
+            value: this.state.text,
+            onChange: this._textChange,
+          }),
+          counter
+        );
+      }
+  });
+
+    let Counter = React.createClass({
+      name: "Counter",
+      mixins: [logMixin],
+      propTypes: {
+        count: React.PropTypes.number.isRequired,
+      },
+      render: function() {
+        return React.DOM.span(null, this.props.count);
+      }
+    });
+
+      let myTextAreaCounter = ReactDOM.render(
+        React.createElement(TextAreaCounter, {
+          defaultValue: "Hi there",
+        }),
+        document.getElementById("app")
+        );
+    </script>
+
+  </body>
+</html>
