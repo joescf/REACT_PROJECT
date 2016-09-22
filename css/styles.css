@@ -1,4 +1,10 @@
 #app {
   border: 1px solid black;
-  width: 55%;
+  width: 65%;
 }
+td {
+  border: 1px solid black;
+}
+/*table {
+  border-collapse: collapse;
+}*/
