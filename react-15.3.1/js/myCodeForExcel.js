@@ -2,6 +2,19 @@ $(document).ready(function() {
 
 console.log("my code");
 
+let headers = [
+    "Book", "Author", "Language", "Published", "Sales"]
+
+    let data = [
+    ["The Lord of the Rings", "J.R.R. Tolkien", "English", "1954-1955", "150 million"],
+    ["Le Petit Prince (The Little Prince)", "Antione de Saint-Exupery", "French", "1943", "140 million"],
+    ["Harry Potter and the Philosopher's Stone", "J.K. Rowling", "English", "1997", "107 million"],
+    ["And Then There Were None", "Agatha Christie", "English", "1939", "100 million"],
+    ["Dream of the Red Chamber", "Cao Xueqin", "Chinese", "1754-1791", "100 million"],
+    ["The Hobbit", "J.R.R Tolkien", "English", "1937", "100 million"],
+    ["She: A History of Adventure", "H. Rider Haggard", "English", "1887", "100 million"],
+    ];
+
     let Excel = React.createClass({
       displayName: "Excel",
 
@@ -60,7 +73,39 @@ console.log("my code");
         });
       },
 
-      _preSearchData: null,
+    _preSearchData: null,
+
+    _log: [],
+
+    _logSetState: function(newState) {
+      // remeber the old state in a clone
+      this._log.push(JSON.parse(JSON.stringify(
+        this._log.length === 0 ? this.state : newState)));
+      this.setState(newState);
+    },
+
+    componentDidMount: function() {
+      document.onkeydown = function(e) {
+        if (e.altKey && e.shiftKey && e.keyCode === 82) {
+          this._replay();
+        }
+      }.bind(this);
+    },
+
+    _replay: function() {
+      if (this._log.length === 0) {
+        console.log("No state to replay yet");
+        return;
+      }
+      let idx = -1;
+      let interval = setInterval(function() {
+        idx++;
+        if (idx === this._log.length -1) {
+          clearInterval(interval);
+        }
+        this.setState(this._log[ind]);
+      }.bind(this), 1000);
+    },
 
     _toggleSearch: function() {
       if (this.state.search) {
@@ -101,13 +146,39 @@ console.log("my code");
       },
 
       _renderToolbar: function() {
-        return React.DOM.button(
-        {
-          onClick: this._toggleSearch,
-          className: "toolbar",
-        },
-        "search"
+        return React.DOM.div({className: "toolbar"},
+          React.DOM.button({
+            onClick: this._toggleSearch
+          }, "Search"),
+          React.DOM.a({
+            onClick: this._download.bind(this, "json"),
+            href: "data.json"
+          }, "Export JSON"),
+          React.DOM.a({
+            onClick: this._download.bind(this,"CSV"),
+            href: "data.csv"
+          }, "Export CSV")
         );
+      },
+
+      _download: function(format, ev) {
+        let contents = format === "json"
+          ? JSON.stringify(this.state.data)
+          : this.state.data.reduce(function(result, row) {
+            return result
+              + row.reduce(function(rowresult, cell, idx) {
+                return rowresult
+                  +'"'
+                  + cell.replace(/"/g, '""')
+                  + '"'
+                  + (idx < row.length - 1 ? ',' : '');
+              }, '')
+            + "\n";
+          }, '');
+        let URL = window.url || window.URL;
+        let blob = new Blob([contents], {type: 'text/' + format});
+        ev.target.href = URL.createObjectURL(blob);
+        ev.target._download = 'data.' + format;
       },
 
       _renderSearch: function() {
@@ -171,18 +242,6 @@ console.log("my code");
     }
   });
 
-let headers = [
-    "Book", "Author", "Language", "Published", "Sales"]
-
-    let data = [
-    ["The Lord of the Rings", "J.R.R. Tolkien", "English", "1954-1955", "150 million"],
-    ["Le Petit Prince (The Little Prince)", "Antione de Saint-Exupery", "French", "1943", "140 million"],
-    ["Harry Potter and the Philosopher's Stone", "J.K. Rowling", "English", "1997", "107 million"],
-    ["And Then There Were None", "Agatha Christie", "English", "1939", "100 million"],
-    ["Dream of the Red Chamber", "Cao Xueqin", "Chinese", "1754-1791", "100 million"],
-    ["The Hobbit", "J.R.R Tolkien", "English", "1937", "100 million"],
-    ["She: A History of Adventure", "H. Rider Haggard", "English", "1887", "100 million"],
-    ];
 
     let Ex = ReactDOM.render(
       React.createElement(Excel, {

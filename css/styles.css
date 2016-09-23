@@ -8,3 +8,23 @@ table thead th {
 table tbody tr {
   border-bottom: 1px solid black;
 }
+button {
+  font-family: arial;
+  font-size: 11px;
+  border: none;
+  border-radius: 25px;
+  background-color: yellow;
+  color: blue;
+}
+a {
+  font-family: arial;
+  font-size: 11px;
+  color: blue;
+  text-decoration: none;
+  margin-right: 40px;
+  margin-left: 40px;
+  background-color: yellow;
+  padding: 3.5px;
+  border-radius: 25px;
+
+}
