@@ -131,6 +131,7 @@
           sortby: null,
           descending: false,
           edit: null,
+          search: false,
         };
       },
 
@@ -169,6 +170,45 @@
       },
 
       render: function() {
+        return (
+          React.DOM.div(null,
+            this._renderToolbar(),
+            this._renderTable()
+          )
+        );
+      },
+
+      _renderToolbar: function() {
+        return React.DOM.button(
+        {
+          onClick: this._toggleSearch,
+          className: "toolbar",
+        },
+        "search"
+        );
+      },
+
+      _renderSearch: function() {
+        if (!this.state.search) {
+          return null;
+        }
+        return (
+          React.DOM.tr({onChange: this._search},
+
+      this.props.headers.map(function(_ignore, idx) {
+        return React.DOM.td({key: idx},
+          React.DOM.input({
+            type: "text",
+            "data_idx": idx,
+          })
+        );
+      })
+    )
+  );
+},
+
+      _renderTable: function() {
+        let self = this;
         return (
           React.DOM.table(null,
             React.DOM.thead({onClick: this._sort},
@@ -209,7 +249,44 @@
           )
         )
       );
+    },
+
+    _toggleSearch: function() {
+      if (this.state.search) {
+        this.setState({
+          data: this._preSearchData,
+          search: false,
+        });
+        this._preSearchData = null;
+      } else {
+        this._preSearchData = this.state.data;
+        this.setState({
+          search: true,
+        });
+      }
+    },
+
+    _search: function(e) {
+      let needle = e.target.value.toLowerCase();
+      if (!needle) {
+      // the search string is deleted
+      this.setState({data: this._preSearchData});
+      return;
     }
+    let idx = e.target.dataset.idx;
+    // which column to search
+    let searchdata = this._preSearchData.filter(function(row) {
+      return
+      row[idx].toString().toLowerCase().indexOf(needle) > -1;
+    });
+    this.setState({data: searchdata});
+      },
+
+    _preSearchData: function() {
+      let Excel = React.createClass({
+        _preSearchData: null,
+      });
+    },
   });
 
     ReactDOM.render(
@@ -220,12 +297,12 @@
       document.getElementById("app")
       );
 
-    // let myTextAreaCounter = ReactDOM.render(
-    //   React.createElement(TextAreaCounter, {
-    //     defaultValue: "",
-    //   }),
-    //   document.getElementById("app")
-    // );
+      // let myTextAreaCounter = ReactDOM.render(
+      //   React.createElement(TextAreaCounter, {
+      //     defaultValue: "",
+      //   }),
+      //   document.getElementById("app")
+      // );
     </script>
 
   </body>
